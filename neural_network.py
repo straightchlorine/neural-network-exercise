@@ -2,14 +2,14 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from time import time
+from time import perf_counter
 from matplotlib.gridspec import GridSpec
 
 
 class XORNeuralNetwork:
     def __init__(self, learning_rate=0.1):
         self.weights = np.random.normal(0, 1, (2, 1))
-        self.bias = np.random.normal(0, 1, 1)
+        self.bias = np.random.normal(0, 1)  # Initialize as scalar
         self.learning_rate = learning_rate
         self.mse_history = []
         self.weight_history = []
@@ -19,8 +19,9 @@ class XORNeuralNetwork:
     def sigmoid(self, x):
         return 1 / (1 + np.exp(-x))
 
-    def sigmoid_derivative(self, x):
-        return x * (1 - x)
+    def sigmoid_derivative(self, sigmoid_output):
+        # Derivative expects sigmoid output (not raw input)
+        return sigmoid_output * (1 - sigmoid_output)
 
     def forward_propagation(self, X):
         weighted_sum = np.dot(X, self.weights) + self.bias
@@ -39,7 +40,7 @@ class XORNeuralNetwork:
         epoch_times = []
 
         for epoch in range(epochs):
-            epoch_start = time()
+            epoch_start = perf_counter()
 
             output = self.forward_propagation(X)
             error = self.backward_propagation(X, y, output)
@@ -48,10 +49,10 @@ class XORNeuralNetwork:
             mse = np.mean(error**2)
             self.mse_history.append(mse)
             self.weight_history.append(self.weights.copy())
-            self.bias_history.append(self.bias.copy())
+            self.bias_history.append(self.bias)
             self.accuracy_history.append(self.calculate_accuracy(X, y))
 
-            epoch_end = time()
+            epoch_end = perf_counter()
             epoch_times.append(epoch_end - epoch_start)
 
         return np.mean(epoch_times)
@@ -69,7 +70,7 @@ def plot_decision_boundary(nn, X, y):
     # Create a mesh grid
     x_min, x_max = X[:, 0].min() - 0.5, X[:, 0].max() + 0.5
     y_min, y_max = X[:, 1].min() - 0.5, X[:, 1].max() + 0.5
-    xx, yy = np.meshgrid(np.arange(x_min, x_max, 0.02), np.arange(y_min, y_max, 0.02))
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, 0.05), np.arange(y_min, y_max, 0.05))
 
     # Make predictions for each point in the mesh
     Z = nn.predict(np.c_[xx.ravel(), yy.ravel()])
@@ -170,7 +171,7 @@ def print_detailed_analysis(nn, avg_epoch_time):
     print("-" * 50)
     print(f"Final Model Parameters:")
     print(f"Weights: {nn.weights.flatten()}")
-    print(f"Bias: {nn.bias[0]}")
+    print(f"Bias: {nn.bias}")
     print(f"\nTraining Metrics:")
     print(f"Initial MSE: {nn.mse_history[0]:.6f}")
     print(f"Final MSE: {nn.mse_history[-1]:.6f}")

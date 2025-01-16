@@ -2,15 +2,11 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
 from time import strftime
 from io import BytesIO
 import base64
 from matplotlib.gridspec import GridSpec
 from neural_network import XORNeuralNetwork
-
-# Note: Import the XORNeuralNetwork class from the previous implementation
-# or include it here. For brevity, I'm assuming it's imported.
 
 
 def generate_plot_base64(fig):
